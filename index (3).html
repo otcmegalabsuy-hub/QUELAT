@@ -479,7 +479,7 @@ body { background: #0D2378; color: var(--q-white); font-family: var(--font); ove
     <h2>Participantes</h2>
     <span id="adminCount" style="font-size: 14px; font-weight: 700;">0 en este dispositivo</span>
   </div>
-  <p style="margin: 0; font-size: 13px; line-height: 1.4;">Copiá la lista y pegala en Excel o Google Sheets. Los datos quedan guardados solo en este dispositivo.</p>
+  <p style="margin: 0; font-size: 13px; line-height: 1.4;">Copiá la lista y pegala en Excel o Google s. Los datos quedan guardados solo en este dispositivo.</p>
   <div id="adminList"></div>
   <textarea id="copyBox" hidden readonly aria-label="Lista para copiar"></textarea>
   <div style="display: flex; gap: 10px;">
@@ -497,9 +497,9 @@ body { background: #0D2378; color: var(--q-white); font-family: var(--font); ove
   'use strict';
 
   /* ===== Configuración ===== */
-  // Para recibir los datos del sorteo en Google Sheets (al publicar en GitHub Pages),
+  // Para recibir los datos del sorteo en Google s (al publicar en GitHub Pages),
   // pegá acá la URL de la app web de Google Apps Script. Vacío = solo se guarda en el dispositivo.
-  var SHEETS_URL = '';
+  var SHEETS_URL = 'https://script.google.com/macros/s/AKfycbx74SdZCuIbBCBxBlNqI5GI9IFlDUvw8ZFTrNa560FadEAAJM0NIkbOvUfP-o-a3VwV/exec';
   var DURACION = 60;            // segundos de juego
   var STORE_KEY = 'quelat-sorteo-v1';
 
