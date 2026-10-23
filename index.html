@@ -43,8 +43,6 @@ body { background: #0D2378; color: var(--q-white); font-family: var(--font); ove
 .q-se { background: radial-gradient(circle at 35% 30%, #9ff5c6 0%, #20b56a 42%, #0a6e3c 100%); --q-glow: rgba(50,225,135,.55); }
 .q-fe { background: radial-gradient(circle at 35% 30%, #d7c2ff 0%, #7a4ad6 42%, #3d1d8a 100%); --q-glow: rgba(170,130,255,.6); }
 .q-ca { background: radial-gradient(circle at 35% 30%, #fff6c4 0%, #ffcf1f 42%, #c48d00 100%); --q-glow: rgba(255,215,50,.6); color: var(--q-ink); text-shadow: 0 1px 0 rgba(255,255,255,.45); }
-.q-q { background: radial-gradient(circle at 35% 30%, #ffffff 0%, #d5f1ff 28%, #6cc6f7 62%, #1f73c9 100%); --q-glow: rgba(160,225,255,.95); color: var(--q-deep); text-shadow: none; font-weight: 900; }
-.q-q::after { content: ""; position: absolute; inset: -6px; border-radius: 50%; border: 2px dashed rgba(255,255,255,.85); animation: q-spin 3s linear infinite; pointer-events: none; }
 
 /* ---------- Ilustración ---------- */
 .q-float { animation: q-float 3.2s ease-in-out infinite; }
@@ -105,7 +103,8 @@ body { background: #0D2378; color: var(--q-white); font-family: var(--font); ove
 .q-swap:disabled { cursor: default; opacity: .75; }
 .q-meter { height: 8px; border-radius: 4px; background: rgba(255,255,255,.18); overflow: hidden; }
 .q-meter-fill { height: 100%; width: 0; border-radius: 4px; background: linear-gradient(90deg, #6cc6f7, #ffffff); box-shadow: 0 0 8px rgba(160,225,255,.9); transition: width .3s ease; }
-.q-ready { animation: q-blink .9s ease-in-out infinite; color: #fff !important; }
+.q-meter.is-warn .q-meter-fill { background: linear-gradient(90deg, #FFD31A, #ffffff); box-shadow: 0 0 8px rgba(255,211,26,.9); }
+.is-warn-text { color: var(--q-yellow) !important; animation: q-blink .9s ease-in-out infinite; }
 .q-toast { position: absolute; left: 50%; top: 0; transform: translateX(-50%); white-space: nowrap; padding: 10px 20px; border-radius: 14px; font-weight: 900; font-style: italic; font-size: 24px; letter-spacing: .02em; color: var(--q-ink); box-shadow: 0 10px 26px rgba(4,12,60,.45); animation: q-toast 1.25s cubic-bezier(.2,.8,.2,1) forwards; pointer-events: none; }
 .q-toast-y { background: var(--q-yellow); }
 .q-toast-w { background: #fff; }
@@ -177,7 +176,7 @@ body { background: #0D2378; color: var(--q-white); font-family: var(--font); ove
   100% { opacity: 0; transform: translate(-50%, -26px) scale(.96); }
 }
 @media (prefers-reduced-motion: reduce) {
-  .q-float, .q-beam, .q-pulse, .q-wave-move, .q-node, .q-q::after, .q-ready, .q-timer.is-low, .q-screen-in, .q-card-in, .q-overlay { animation: none !important; }
+  .q-float, .q-beam, .q-pulse, .q-wave-move, .q-node, .is-warn-text, .q-timer.is-low, .q-screen-in, .q-card-in, .q-overlay { animation: none !important; }
 }
 </style>
 
@@ -284,7 +283,6 @@ body { background: #0D2378; color: var(--q-white); font-family: var(--font); ove
     <span style="font-size: 13.5px; line-height: 1.4;">Uní 3 o más minerales iguales y tu cuerpo los absorbe. El reloj arranca con tu primer tiro.</span>
   </div>
 
-  <span id="missText" style="position: absolute; left: 0; top: 708px; width: 390px; text-align: center; font-size: 10.5px; font-weight: 700; letter-spacing: .06em; line-height: 1; z-index: 2; pointer-events: none;">NUEVA FILA EN 6 TIROS SIN ABSORBER</span>
 
   <button id="field" type="button" aria-label="Tablero de juego. Apuntá con las flechas y lanzá con Enter."></button>
 
@@ -299,12 +297,9 @@ body { background: #0D2378; color: var(--q-white); font-family: var(--font); ove
   </div>
 
   <div style="position: absolute; left: 280px; top: 638px; width: 94px; display: flex; flex-direction: column; gap: 7px; z-index: 4; pointer-events: none;">
-    <div style="display: flex; align-items: center; gap: 7px;">
-      <div class="q-orb q-q" style="width: 20px; height: 20px; font-size: 10px; border-width: 1px;">Q</div>
-      <span style="font-size: 11.5px; font-weight: 900; font-style: italic; letter-spacing: .04em;">AMINO-Q</span>
-    </div>
-    <div class="q-meter"><div id="qFill" class="q-meter-fill"></div></div>
-    <span id="qLabel" style="font-size: 10px; font-weight: 800; letter-spacing: .06em; color: #CDEFFF;">FALTAN 15</span>
+    <span style="font-size: 11.5px; font-weight: 900; font-style: italic; letter-spacing: .04em;">NUEVA FILA</span>
+    <div id="rowMeter" class="q-meter"><div id="rowFill" class="q-meter-fill"></div></div>
+    <span id="rowLabel" style="font-size: 10px; font-weight: 800; letter-spacing: .06em; line-height: 1.25; color: #CDEFFF;">EN 6 TIROS<br>SIN ABSORBER</span>
   </div>
 
   <div id="toasts" aria-live="polite" style="position: absolute; left: 0; top: 330px; width: 390px; height: 0; z-index: 6; pointer-events: none;"></div>
@@ -479,7 +474,7 @@ body { background: #0D2378; color: var(--q-white); font-family: var(--font); ove
     <h2>Participantes</h2>
     <span id="adminCount" style="font-size: 14px; font-weight: 700;">0 en este dispositivo</span>
   </div>
-  <p style="margin: 0; font-size: 13px; line-height: 1.4;">Copiá la lista y pegala en Excel o Google s. Los datos quedan guardados solo en este dispositivo.</p>
+  <p style="margin: 0; font-size: 13px; line-height: 1.4;">Copiá la lista y pegala en Excel o Google Sheets. Los datos quedan guardados solo en este dispositivo.</p>
   <div id="adminList"></div>
   <textarea id="copyBox" hidden readonly aria-label="Lista para copiar"></textarea>
   <div style="display: flex; gap: 10px;">
@@ -497,27 +492,26 @@ body { background: #0D2378; color: var(--q-white); font-family: var(--font); ove
   'use strict';
 
   /* ===== Configuración ===== */
-  // Para recibir los datos del sorteo en Google s (al publicar en GitHub Pages),
+  // Para recibir los datos del sorteo en Google Sheets (al publicar en GitHub Pages),
   // pegá acá la URL de la app web de Google Apps Script. Vacío = solo se guarda en el dispositivo.
-  var SHEETS_URL = 'https://script.google.com/macros/s/AKfycbx74SdZCuIbBCBxBlNqI5GI9IFlDUvw8ZFTrNa560FadEAAJM0NIkbOvUfP-o-a3VwV/exec';
+  var SHEETS_URL = '';
   var DURACION = 60;            // segundos de juego
   var STORE_KEY = 'quelat-sorteo-v1';
 
   var C = {
     W: 390, FH: 600, CH: 720, D: 40, R: 20, RH: 34.641, OX: 15, OY: 2, COLS: 9,
     ROWS_MAX: 14, LX: 195, LY: 540, SPEED: 1000, INIT_ROWS: 6,
-    DROP_EVERY: 6, Q_EVERY: 15, MEM_Y: 624, PAD: 14,
+    DROP_EVERY: 6, MEM_Y: 624, PAD: 14,
     KEYS: ['mg', 'zn', 'se', 'fe', 'ca']
   };
-  var SYM = { mg: 'Mg', zn: 'Zn', se: 'Se', fe: 'Fe', ca: 'Ca', q: 'Q' };
-  var NAME = { mg: 'Magnesio', zn: 'Zinc', se: 'Selenio', fe: 'Hierro', ca: 'Calcio', q: 'AMINO-Q' };
+  var SYM = { mg: 'Mg', zn: 'Zn', se: 'Se', fe: 'Fe', ca: 'Ca' };
+  var NAME = { mg: 'Magnesio', zn: 'Zinc', se: 'Selenio', fe: 'Hierro', ca: 'Calcio' };
   var PAL = {
     mg: { s: ['#ff9ccb', '#e8318a', '#a10f58'], glow: 'rgba(255,70,160,.6)', text: '#fff', trail: '255,120,190', ring: '#ff8cc4' },
     zn: { s: ['#b5dcff', '#4d93f0', '#1a4fb8'], glow: 'rgba(120,190,255,.65)', text: '#fff', trail: '140,200,255', ring: '#9fd2ff' },
     se: { s: ['#9ff5c6', '#20b56a', '#0a6e3c'], glow: 'rgba(50,225,135,.55)', text: '#fff', trail: '90,235,160', ring: '#7cf0b5' },
     fe: { s: ['#d7c2ff', '#7a4ad6', '#3d1d8a'], glow: 'rgba(170,130,255,.6)', text: '#fff', trail: '195,165,255', ring: '#cdb6ff' },
-    ca: { s: ['#fff6c4', '#ffcf1f', '#c48d00'], glow: 'rgba(255,215,50,.6)', text: '#13226E', trail: '255,220,80', ring: '#ffe27a' },
-    q:  { s: ['#ffffff', '#6cc6f7', '#1f73c9'], glow: 'rgba(160,225,255,.95)', text: '#0E2378', trail: '190,235,255', ring: '#d5f3ff' }
+    ca: { s: ['#fff6c4', '#ffcf1f', '#c48d00'], glow: 'rgba(255,215,50,.6)', text: '#13226E', trail: '255,220,80', ring: '#ffe27a' }
   };
   var HERO = [['mg', '#FF7DBA'], ['zn', '#8FCBFF'], ['se', '#5BEA9F'], ['fe', '#C4A6FF'], ['ca', '#FFD84A']];
   var ANS = [1, 2];
@@ -576,8 +570,7 @@ body { background: #0D2378; color: var(--q-white); font-family: var(--font); ove
     x.shadowColor = P.glow; x.shadowBlur = 12;
     var gx = cx - 0.3 * r, gy = cy - 0.4 * r;
     var g = x.createRadialGradient(gx, gy, 0, gx, gy, 1.9 * r);
-    if (key === 'q') { g.addColorStop(0, '#ffffff'); g.addColorStop(0.28, '#d5f1ff'); g.addColorStop(0.62, '#6cc6f7'); g.addColorStop(1, '#1f73c9'); }
-    else { g.addColorStop(0, P.s[0]); g.addColorStop(0.42, P.s[1]); g.addColorStop(1, P.s[2]); }
+    g.addColorStop(0, P.s[0]); g.addColorStop(0.42, P.s[1]); g.addColorStop(1, P.s[2]);
     x.fillStyle = g; x.beginPath(); x.arc(cx, cy, r, 0, Math.PI * 2); x.fill();
     x.shadowBlur = 0; x.shadowColor = 'transparent';
     var sh = x.createRadialGradient(cx - 0.25 * r, cy - 0.3 * r, 0.45 * r, cx, cy, r * 1.02);
@@ -590,7 +583,7 @@ body { background: #0D2378; color: var(--q-white); font-family: var(--font); ove
     hg.addColorStop(0, 'rgba(255,255,255,.9)'); hg.addColorStop(1, 'rgba(255,255,255,0)');
     x.fillStyle = hg; x.beginPath(); x.arc(0, 0, 0.4 * r, 0, Math.PI * 2); x.fill();
     x.restore();
-    x.font = (key === 'q' ? '900 ' : '800 ') + Math.round(r * 0.75) + 'px Poppins, "Segoe UI", Roboto, system-ui, sans-serif';
+    x.font = '800 ' + Math.round(r * 0.75) + 'px Poppins, "Segoe UI", Roboto, system-ui, sans-serif';
     x.textAlign = 'center'; x.textBaseline = 'middle';
     if (P.text === '#fff') { x.shadowColor = 'rgba(0,0,0,.35)'; x.shadowBlur = 2; x.shadowOffsetY = 1; }
     x.fillStyle = P.text; x.fillText(SYM[key], cx, cy + r * 0.05);
@@ -648,7 +641,7 @@ body { background: #0D2378; color: var(--q-white); font-family: var(--font); ove
   }
   function present() {
     var set = {};
-    G.grid.forEach(function (row) { row.forEach(function (k) { if (k && k !== 'q') set[k] = 1; }); });
+    G.grid.forEach(function (row) { row.forEach(function (k) { if (k) set[k] = 1; }); });
     return Object.keys(set);
   }
   function randKey() { var p = present(), pool = p.length ? p : C.KEYS; return pool[Math.floor(Math.random() * pool.length)]; }
@@ -683,7 +676,7 @@ body { background: #0D2378; color: var(--q-white); font-family: var(--font); ove
   }
   function newGame() {
     G = { grid: [], parity: 0, shot: null, effects: [], score: 0, absorbed: { mg: 0, zn: 0, se: 0, fe: 0, ca: 0 },
-      started: false, over: null, startAt: 0, timeLeft: DURACION, qMeter: 0, misses: 0, angle: Math.PI / 2,
+      started: false, over: null, startAt: 0, timeLeft: DURACION, misses: 0, angle: Math.PI / 2,
       ver: 0, lastShotAt: 0, current: 'mg', next: 'zn' };
     for (var r = 0; r < C.INIT_ROWS; r++) {
       var row = new Array(C.COLS).fill(null);
@@ -763,29 +756,19 @@ body { background: #0D2378; color: var(--q-white); font-family: var(--font); ove
     while (G.grid.length <= target.r) G.grid.push(new Array(C.COLS).fill(null));
     G.grid[target.r][target.c] = s.k;
     var now = performance.now(), removed = [];
-    if (s.k === 'q') {
-      var seen = {}; seen[target.r + ',' + target.c] = 1; removed.push([target.r, target.c]);
-      nbrs(target.r, target.c).forEach(function (n) {
-        var k = cell(n[0], n[1]);
-        if (!k || k === 'q') return;
-        flood(n[0], n[1], k).forEach(function (m) { var id = m[0] + ',' + m[1]; if (!seen[id]) { seen[id] = 1; removed.push(m); } });
-      });
-    } else {
-      var grp = flood(target.r, target.c, s.k);
-      if (grp.length >= 3) removed = grp;
-    }
+    var grp = flood(target.r, target.c, s.k);
+    if (grp.length >= 3) removed = grp;
     var popped = 0, dropped = 0;
     if (removed.length) {
       removed.forEach(function (m, i) {
         var k = G.grid[m[0]][m[1]]; G.grid[m[0]][m[1]] = null;
         var p = pos(m[0], m[1]);
-        if (k === 'q') { G.effects.push({ kind: 'qburst', x: p.x, y: p.y, k: 'q', t0: now, delay: 0, dur: 650 }); return; }
         popped++; G.absorbed[k]++;
         G.effects.push({ kind: 'pop', x: p.x, y: p.y, k: k, t0: now, delay: i * 35, dur: 520 + (C.MEM_Y - p.y) * 0.6, wob: 0 });
       });
       floating().forEach(function (m, i) {
         var k = G.grid[m[0]][m[1]]; G.grid[m[0]][m[1]] = null;
-        if (!k || k === 'q') return;
+        if (!k) return;
         var p = pos(m[0], m[1]);
         dropped++; G.absorbed[k]++;
         G.effects.push({ kind: 'drop', x: p.x, y: p.y, k: k, t0: now, delay: 140 + i * 20, dur: 560 + (C.MEM_Y - p.y) * 0.45, wob: (Math.random() - 0.5) * 36 });
@@ -794,15 +777,9 @@ body { background: #0D2378; color: var(--q-white); font-family: var(--font); ove
     }
     var pts = popped * 10 + Math.max(0, popped - 3) * 10 + dropped * 30;
     G.score += pts;
-    if (s.k === 'q') toast('¡AMINO-Q! +' + pts, 'q');
-    else if (dropped) toast('¡ABSORCIÓN x3!', 'y');
+    if (dropped) toast('¡ABSORCIÓN x3!', 'y');
     else if (popped >= 6) toast('¡SÚPER ABSORCIÓN!', 'w');
     else if (popped) toast('+' + pts, 's');
-    var qPending = G.next === 'q' || G.current === 'q';
-    if (!qPending && popped + dropped) {
-      G.qMeter += popped + dropped;
-      if (G.qMeter >= C.Q_EVERY) { G.qMeter = 0; G.next = 'q'; }
-    }
     if (!removed.length) {
       G.misses++;
       if (G.misses >= C.DROP_EVERY) { G.misses = 0; pushRow(); if (!G.over) toast('¡NUEVA FILA!', 'w'); }
@@ -813,8 +790,8 @@ body { background: #0D2378; color: var(--q-white); font-family: var(--font); ove
     }
     var pres = present();
     if (pres.length) {
-      if (G.current !== 'q' && pres.indexOf(G.current) < 0) G.current = randKey();
-      if (G.next !== 'q' && pres.indexOf(G.next) < 0) G.next = randKey();
+      if (pres.indexOf(G.current) < 0) G.current = randKey();
+      if (pres.indexOf(G.next) < 0) G.next = randKey();
     }
     G.ver++;
     hud();
@@ -840,11 +817,6 @@ body { background: #0D2378; color: var(--q-white); font-family: var(--font); ove
     var size = (C.D + C.PAD * 2) * s;
     ctx.globalAlpha = a;
     ctx.drawImage(SPR[k], x - size / 2, y - size / 2, size, size);
-    if (k === 'q') {
-      ctx.save(); ctx.translate(x, y); ctx.rotate((t / 3000) * Math.PI * 2);
-      ctx.setLineDash([5, 4]); ctx.strokeStyle = 'rgba(255,255,255,.85)'; ctx.lineWidth = 2;
-      ctx.beginPath(); ctx.arc(0, 0, 26 * s, 0, Math.PI * 2); ctx.stroke(); ctx.restore();
-    }
     ctx.globalAlpha = 1;
   }
   function draw() {
@@ -896,11 +868,10 @@ body { background: #0D2378; color: var(--q-white); font-family: var(--font); ove
     var hot = false;
     G.effects.forEach(function (e) {
       var pr = clamp((t - e.t0 - e.delay) / e.dur, 0, 1), P = PAL[e.k];
-      if (e.kind === 'ring' || e.kind === 'qburst') {
-        var rw, rh;
-        if (e.kind === 'ring') { rw = (24 + 80 * pr) / 2; rh = (8 + 18 * pr) / 2; hot = true; }
-        else { rw = rh = (40 + 130 * pr) / 2; }
-        ctx.save(); ctx.globalAlpha = 1 - pr; ctx.strokeStyle = P.ring; ctx.lineWidth = e.kind === 'ring' ? 2 : 3;
+      if (e.kind === 'ring') {
+        var rw = (24 + 80 * pr) / 2, rh = (8 + 18 * pr) / 2;
+        hot = true;
+        ctx.save(); ctx.globalAlpha = 1 - pr; ctx.strokeStyle = P.ring; ctx.lineWidth = 2;
         ctx.shadowColor = P.glow; ctx.shadowBlur = 12;
         ctx.beginPath(); ctx.ellipse(e.x, e.y, rw, rh, 0, 0, Math.PI * 2); ctx.stroke(); ctx.restore();
         return;
@@ -956,12 +927,11 @@ body { background: #0D2378; color: var(--q-white); font-family: var(--font); ove
     hudTime();
     C.KEYS.forEach(function (k) { $('cnt-' + k).textContent = G.absorbed[k]; });
     var ml = C.DROP_EVERY - G.misses;
-    $('missText').textContent = 'NUEVA FILA EN ' + ml + (ml === 1 ? ' TIRO SIN ABSORBER' : ' TIROS SIN ABSORBER');
-    var qReady = G.next === 'q' || G.current === 'q';
-    $('qFill').style.width = (qReady ? 100 : Math.round(Math.min(1, G.qMeter / C.Q_EVERY) * 100)) + '%';
-    var ql = $('qLabel');
-    ql.textContent = qReady ? '¡LISTO!' : 'FALTAN ' + Math.max(0, C.Q_EVERY - G.qMeter);
-    ql.classList.toggle('q-ready', qReady);
+    $('rowFill').style.width = Math.round((G.misses / C.DROP_EVERY) * 100) + '%';
+    $('rowMeter').classList.toggle('is-warn', ml === 1);
+    var rl = $('rowLabel');
+    rl.innerHTML = 'EN ' + ml + (ml === 1 ? ' TIRO' : ' TIROS') + '<br>SIN ABSORBER';
+    rl.classList.toggle('is-warn-text', ml === 1);
     var no = $('nextOrb');
     no.className = 'q-orb q-' + G.next; no.textContent = SYM[G.next];
     var sw = $('swap');
