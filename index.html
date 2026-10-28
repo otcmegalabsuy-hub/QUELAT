@@ -371,24 +371,20 @@ body { background: #0D2378; color: var(--q-white); font-family: var(--font); ove
       <span style="font-size: 44px; font-weight: 900; letter-spacing: -.02em;">¡PARTICIPÁ</span>
       <span style="font-size: 37px; font-weight: 900; font-style: italic; letter-spacing: -.01em; color: var(--q-yellow);">DEL SORTEO!</span>
     </div>
-    <div style="align-self: flex-start; background: #fff; color: var(--q-ink); border-radius: 10px; padding: 9px 14px; font-size: 15px; font-weight: 500; line-height: 1.25;">Dejá tus datos y participá por <strong style="font-weight: 800;">un Proyector HD</strong></div>
+    <div style="align-self: stretch; background: var(--q-yellow); color: var(--q-ink); border-radius: 14px; padding: 13px 16px; font-size: 19px; font-weight: 600; line-height: 1.28; box-shadow: 0 8px 20px rgba(4,12,60,.3);">Dejá tus datos y participá por <strong style="font-weight: 900;">un Proyector HD Wanbo Cube&nbsp;2&nbsp;Pro</strong></div>
 
     <form id="form" novalidate style="display: flex; flex-direction: column; gap: 10px; margin: 2px 0 0;">
       <label class="q-label" for="f-nombre">Nombre y apellido
         <input id="f-nombre" class="q-input" type="text" autocomplete="off" placeholder="Ej.: María Pérez">
         <span class="q-err" data-err="nombre" hidden>Ingresá tu nombre y apellido.</span>
       </label>
-      <label class="q-label" for="f-ci">Cédula de identidad
-        <input id="f-ci" class="q-input" type="tel" inputmode="numeric" autocomplete="off" placeholder="Ej.: 1.234.567-2">
-        <span class="q-err" data-err="ci" hidden>Revisá tu cédula: incluí el dígito verificador.</span>
-      </label>
       <label class="q-label" for="f-cel">Celular
         <input id="f-cel" class="q-input" type="tel" inputmode="tel" autocomplete="off" placeholder="Ej.: 099 123 456">
         <span class="q-err" data-err="cel" hidden>Ingresá un celular uruguayo válido.</span>
       </label>
-      <label class="q-label" for="f-email">Correo electrónico
-        <input id="f-email" class="q-input" type="email" inputmode="email" autocomplete="off" autocapitalize="off" placeholder="Ej.: maria@correo.com">
-        <span class="q-err" data-err="email" hidden>Ingresá un correo válido.</span>
+      <label class="q-label" for="f-farmacia">Farmacia
+        <input id="f-farmacia" class="q-input" type="text" autocomplete="off" placeholder="¿En qué farmacia estás?">
+        <span class="q-err" data-err="farmacia" hidden>Ingresá el nombre de la farmacia.</span>
       </label>
       <label for="f-acepta" style="display: flex; align-items: flex-start; gap: 10px; min-height: 44px; padding-top: 4px; font-size: 13px; line-height: 1.35; cursor: pointer;">
         <input id="f-acepta" class="q-check" type="checkbox">
@@ -1026,19 +1022,11 @@ body { background: #0D2378; color: var(--q-white); font-family: var(--font); ove
   });
 
   /* ===== Sorteo ===== */
-  var F = { nombre: $('f-nombre'), ci: $('f-ci'), cel: $('f-cel'), email: $('f-email'), acepta: $('f-acepta') };
+  var F = { nombre: $('f-nombre'), cel: $('f-cel'), farmacia: $('f-farmacia'), acepta: $('f-acepta') };
   function setErr(k, on) {
     var el = document.querySelector('[data-err="' + k + '"]');
     if (el) el.hidden = !on;
     if (F[k] && k !== 'acepta') F[k].classList.toggle('has-err', on);
-  }
-  function validCI(v) {
-    var d = String(v || '').replace(/\D/g, '');
-    if (d.length < 7 || d.length > 8) return false;
-    d = d.padStart(8, '0');
-    var w = [2, 9, 8, 7, 6, 3, 4], s = 0;
-    for (var i = 0; i < 7; i++) s += Number(d[i]) * w[i];
-    return (10 - (s % 10)) % 10 === Number(d[7]);
   }
   function validCel(v) {
     var d = String(v || '').replace(/\D/g, '');
@@ -1049,7 +1037,7 @@ body { background: #0D2378; color: var(--q-white); font-family: var(--font); ove
     F[k].addEventListener(k === 'acepta' ? 'change' : 'input', function () { setErr(k, false); });
   });
   function resetForm() {
-    ['nombre', 'ci', 'cel', 'email'].forEach(function (k) { F[k].value = ''; setErr(k, false); });
+    ['nombre', 'cel', 'farmacia'].forEach(function (k) { F[k].value = ''; setErr(k, false); });
     F.acepta.checked = false; setErr('acepta', false);
     $('formWrap').style.transform = '';
   }
@@ -1059,16 +1047,15 @@ body { background: #0D2378; color: var(--q-white); font-family: var(--font); ove
     e.preventDefault();
     var err = {
       nombre: F.nombre.value.trim().length < 3,
-      ci: !validCI(F.ci.value),
       cel: !validCel(F.cel.value),
-      email: !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(F.email.value.trim()),
+      farmacia: F.farmacia.value.trim().length < 2,
       acepta: !F.acepta.checked
     };
     var bad = Object.keys(err).filter(function (k) { setErr(k, err[k]); return err[k]; });
     if (bad.length) { if (bad[0] !== 'acepta') F[bad[0]].focus(); return; }
     var entry = {
-      fecha: new Date().toISOString(), nombre: F.nombre.value.trim(), ci: F.ci.value.replace(/\D/g, ''),
-      celular: F.cel.value.replace(/\D/g, ''), email: F.email.value.trim(), puntaje: G ? G.score : 0,
+      fecha: new Date().toISOString(), nombre: F.nombre.value.trim(),
+      celular: F.cel.value.replace(/\D/g, ''), farmacia: F.farmacia.value.trim(), puntaje: G ? G.score : 0,
       minerales: G ? total() : 0, respuestas_correctas: [0, 1].filter(function (qi) { return S.quiz.a[qi] === ANS[qi]; }).length
     };
     var list = loadEntries(); list.push(entry); saveEntries(list);
@@ -1103,7 +1090,7 @@ body { background: #0D2378; color: var(--q-white); font-family: var(--font); ove
   ['pointerup', 'pointerleave', 'pointercancel'].forEach(function (ev) { brand.addEventListener(ev, function () { clearTimeout(holdTimer); }); });
   brand.addEventListener('contextmenu', function (e) { e.preventDefault(); });
   function tsv(list) {
-    var head = ['fecha', 'nombre', 'ci', 'celular', 'email', 'puntaje', 'minerales', 'respuestas_correctas'];
+    var head = ['fecha', 'nombre', 'celular', 'farmacia', 'puntaje', 'minerales', 'respuestas_correctas'];
     return [head.join('\t')].concat(list.map(function (e) { return head.map(function (h) { return String(e[h] == null ? '' : e[h]).replace(/[\t\n]/g, ' '); }).join('\t'); })).join('\n');
   }
   function openAdmin() {
@@ -1118,7 +1105,7 @@ body { background: #0D2378; color: var(--q-white); font-family: var(--font); ove
       var d = document.createElement('div'); d.className = 'entry';
       var b = document.createElement('b'); b.textContent = e.nombre; d.appendChild(b);
       d.appendChild(document.createElement('br'));
-      d.appendChild(document.createTextNode('CI ' + e.ci + ' · ' + e.celular + ' · ' + e.email));
+      d.appendChild(document.createTextNode(e.celular + ' · ' + (e.farmacia || '')));
       d.appendChild(document.createElement('br'));
       d.appendChild(document.createTextNode(fmt(e.puntaje) + ' pts · ' + new Date(e.fecha).toLocaleString('es-UY')));
       box.appendChild(d);
